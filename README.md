@@ -1,2 +1,2 @@
 # palletti
-extracting dominant colours from pictures
+Extracting dominant colors from images using k-means clustering
