@@ -4,16 +4,19 @@ import matplotlib
 from PIL import Image, ImageOps
 from sklearn.cluster import KMeans
 import colorsys
+import requests
+from io import BytesIO
 #turn off interactive plotting
 plt.ioff()
 
 
 class Pallette:
-    def __init__(self,image,n_clusters,resample=10):
+    def __init__(self,url,n_clusters,resample=10):
         # Turn interactive plotting off
         plt.ioff()
         #load image
-        pil_img = Image.open(image)
+        response = requests.get(url)
+        pil_img = Image.open(BytesIO(response.content))
         pil_img = ImageOps.flip(pil_img)
         self.img = np.array(pil_img)
         self.n_clusters = n_clusters
@@ -29,7 +32,7 @@ class Pallette:
         self.pallette_rgb = clusters.cluster_centers_.astype('int')
         
         #convert cluster centers to hsv for intuitive sorting
-        self.colors_hsv = [colorsys.rgb_to_hsv(c[0],c[1],c[2]) for c in self.pallette_rgb]
+        self.pallette_hsv = [colorsys.rgb_to_hsv(c[0],c[1],c[2]) for c in self.pallette_rgb]
         
         #Sort dominat colors
         if sort_by == "H" or sort_by == "Hue":
@@ -53,7 +56,7 @@ class Pallette:
         ax = fig.add_subplot(111)
         plt.imshow(self.img,origin="lower")
         for i in range(0,self.n_clusters):
-            rect1 = matplotlib.patches.Rectangle((i*rect_width,-pallette_height-spacing), rect_width, pallette_height, color=self.colors_rgb[i][:]/255)
+            rect1 = matplotlib.patches.Rectangle((i*rect_width,-pallette_height-spacing), rect_width, pallette_height, color=self.pallette_rgb[i][:]/255)
             ax.add_patch(rect1)
         plt.xlim([0, self.width])
         plt.ylim([-200, self.height])
