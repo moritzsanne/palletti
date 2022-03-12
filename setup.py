@@ -8,7 +8,7 @@ setup(
     author_email='moritzsanne@gmail.com',
     url='https://github.com/moritzsanne/palletti',
     install_requires=[
-        'pillow==7.2',
+        'pillow==9.0.1',
         'matplotlib>=3.3.1',
         'numpy>=1.19.2'
     ],
