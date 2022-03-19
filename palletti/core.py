@@ -8,27 +8,46 @@ import requests
 from io import BytesIO
 #turn off interactive plotting
 plt.ioff()
+import math
 
+def capDimensions(width, height, maxPixels):
+    pixels = width * height
+    if (pixels <= maxPixels):
+        return (width, height)
+
+    ratio = float(width) / height
+    scale = math.sqrt(float(pixels) / maxPixels)
+    height2 = int(float(height) / scale)
+    width2 = int(ratio * height / scale)
+    return (width2, height2)
 
 class Pallette:
-    def __init__(self,url,n_clusters,resample=10):
+    def __init__(self,url=None,local_file=None,n_clusters=6,n_samples=5000):
         # Turn interactive plotting off
         plt.ioff()
         #load image
-        response = requests.get(url)
-        pil_img = Image.open(BytesIO(response.content))
+        if url is not None:
+            response = requests.get(url)
+            pil_img = Image.open(BytesIO(response.content))
+        elif local_file is not None:
+            pil_img = Image.open(local_file)
+        else:
+            raise ValueError("Neither Local file nor URL to image file set.")
+        
         pil_img = ImageOps.flip(pil_img)
-        self.img = np.array(pil_img)
+        self.img = np.array(pil_img)        
         self.n_clusters = n_clusters
-        self.resample = resample
         self.width = self.img.shape[1]
         self.height = self.img.shape[0]
+        self.resized_image = np.array(pil_img.resize(capDimensions(self.width,self.height,n_samples)))
+
         self.cluster()
     def cluster(self,sort_by="V"):
         #cluster rgb values using K-means
-        samples = self.img.reshape((self.img.shape[0] * self.img.shape[1], 3))
+
+        samples = self.resized_image.reshape((self.resized_image.shape[0] * self.resized_image.shape[1], 3))
         clusters = KMeans(n_clusters = self.n_clusters)
-        clusters.fit(samples[0:-1:self.resample,:])
+        clusters.fit(samples[0:-1:1,:])
         self.pallette_rgb = clusters.cluster_centers_.astype('int')
         
         #convert cluster centers to hsv for intuitive sorting
