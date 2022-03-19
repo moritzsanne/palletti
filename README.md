@@ -11,8 +11,9 @@ image_pallete = palletti.Pallette(local_file=img,n_clusters=6,n_samples=100000)
 image_pallete.plot()
 
 ```
+![building](https://user-images.githubusercontent.com/15659445/159118927-8565a324-67ab-40cc-bc56-b9be5ad949a4.png)
 
-
+Image by https://unsplash.com/@snapsbyclark
 
 
 The object also return the pallete as an array, in either rgb or hsv colorspace:
@@ -40,5 +41,8 @@ image_pallete.pallette_hsv
 You can also save an image including the plotted pallette:
 
 ```
-image_pallete.save("img_incl_pallette.jpg")
+image_pallete.save("img_incl_pallette.png")
 ```
+
+TODO:
+- fix the margins of the output plot
